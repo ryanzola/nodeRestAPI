@@ -27,6 +27,7 @@
     "multer": "^1.3.0"
   },
   "devDependencies": {
+    "@angular/cli": "^1.6.4",
     "nodemon": "^1.14.10"
   }
 }

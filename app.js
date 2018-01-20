@@ -21,7 +21,7 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
     "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Accept, Authorization"
+    "Origin, X-Requested-With, Accept, Authorization, Content-Type"
   );
 
   if (req.method === "OPTIONS") {
