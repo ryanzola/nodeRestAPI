@@ -57,3 +57,5 @@ typings/
 # dotenv environment variables file
 .env
 
+# environment variables for database connection
+nodemon.json
