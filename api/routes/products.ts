@@ -1,8 +1,8 @@
-const express = require("express");
-const router = express.Router();
-const multer = require("multer");
-const checkAuth = require("../middleware/check-auth");
+import express from 'express'
+import multer from 'multer'
+import checkAuth from '../middleware/check-auth'
 
+const router = express.Router();
 const ProductsController = require("../controllers/products");
 
 const storage = multer.diskStorage({
@@ -37,4 +37,4 @@ router.get("/:productId", ProductsController.products_get_product);
 router.patch("/:productId", checkAuth, ProductsController.products_edit_product);
 router.delete("/:productId", checkAuth, ProductsController.products_delete_product);
 
-module.exports = router;
+export default router;
