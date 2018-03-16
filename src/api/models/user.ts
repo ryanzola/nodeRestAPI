@@ -1,5 +1,6 @@
-var mongoose = require("mongoose");
-var userSchema = mongoose.Schema({
+const mongoose =  require("mongoose");
+
+const userSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     email: {
         type: String,
@@ -11,5 +12,6 @@ var userSchema = mongoose.Schema({
         type: String,
         required: true
     }
-});
-module.exports = mongoose.model("User", userSchema);
+})
+
+module.exports = mongoose.model("User", userSchema)
