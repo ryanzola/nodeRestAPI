@@ -1,6 +1,6 @@
-import express from 'express'
-import multer from 'multer'
-import checkAuth from '../middleware/check-auth'
+const express = require('express')
+const multer = require('multer')
+const checkAuth = require('../middleware/check-auth')
 
 const router = express.Router();
 const ProductsController = require("../controllers/products");
@@ -37,4 +37,4 @@ router.get("/:productId", ProductsController.products_get_product);
 router.patch("/:productId", checkAuth, ProductsController.products_edit_product);
 router.delete("/:productId", checkAuth, ProductsController.products_delete_product);
 
-export default router;
+module.exports = router;

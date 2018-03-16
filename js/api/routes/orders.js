@@ -1,5 +1,5 @@
-import express from 'express'
-import checkAuth from '../middleware/check-auth'
+const express = require('express')
+const checkAuth = require('../middleware/check-auth')
 
 const router = express.Router();
 const OrdersController = require("../controllers/orders");
@@ -9,4 +9,4 @@ router.post("/", checkAuth, OrdersController.orders_create_order);
 router.get("/:orderId", checkAuth, OrdersController.orders_get_order);
 router.delete("/:orderId", checkAuth, OrdersController.orders_delete_order);
 
-export default router;
+module.exports = router;
