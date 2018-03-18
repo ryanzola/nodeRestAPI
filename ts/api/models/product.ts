@@ -1,5 +1,5 @@
 import { Document, Schema, Model, model } from "mongoose";
-import { IProduct } from '../interfaces/product'
+import { IProductDocument } from '../interfaces/product'
 
 export var ProductSchema: Schema = new Schema({
     _id: Schema.Types.ObjectId,
@@ -17,4 +17,5 @@ export var ProductSchema: Schema = new Schema({
     }
 })
 
-export const Product = model('Product', ProductSchema)
+export const Product = model<IProductDocument>('Product', ProductSchema)
+export default Product

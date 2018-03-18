@@ -1,17 +1,13 @@
+import { NextFunction, Request, Response, Router } from 'express';
 import * as mongoose from 'mongoose'
 
 import { Order } from '../models/order'
 import { Product } from '../models/product'
 
 export class OrdersController {
-  constructor(req, res, next) {
-    this.orders_get_all(req, res, next);
-    this.orders_create_order(req, res, next);
-    this.orders_get_order(req, res, next);
-    this.orders_delete_order(req, res, next);
-  }
+  constructor() {}
 
-  orders_get_all = (req, res, next) => {
+  orders_get_all(req: Request, res: Response, next: NextFunction) {
     Order.find()
       .select("product quantity _id")
       .exec()
@@ -38,7 +34,7 @@ export class OrdersController {
       });
   };
 
-  orders_create_order = (req, res, next) => {
+  orders_create_order(req, res, next) {
     Product.findById(req.body.productId)
       .then(product => {
         if (!product) {
@@ -74,7 +70,7 @@ export class OrdersController {
       });
   };
 
-  orders_get_order = (req, res, next) => {
+  orders_get_order(req, res, next) {
     Order.findById(req.params.orderId)
       .exec()
       .then(order => {
@@ -98,7 +94,7 @@ export class OrdersController {
       });
   };
 
-  orders_delete_order = (req, res, next) => {
+  orders_delete_order(req, res, next) {
     Order.remove({ _id: req.params.orderId })
       .exec()
       .then(result => {

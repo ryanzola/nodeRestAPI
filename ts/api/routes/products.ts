@@ -2,14 +2,16 @@ import {Router, Request, Response, NextFunction} from 'express';
 import * as multer from 'multer'
 import checkAuth from '../middleware/check-auth'
 
-const ProductsController = require("../controllers/products");
-const Product = require("../models/product");
+import ProductsController from '../controllers/products';
+import { Product } from '../models/product';
 
 export class ProductsRouter {
   router: Router;
+  productsController: ProductsController;
 
   constructor() {
     this.router = Router();
+    this.productsController = new ProductsController();
     this.init();
   }
 

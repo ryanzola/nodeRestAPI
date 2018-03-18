@@ -1,8 +1,8 @@
-import { Schema } from 'mongoose'
+import { Schema, Document } from 'mongoose'
 
-export interface IProduct {
-  _id?: Schema.Types.ObjectId,
-  name?: String,
-  price?: Number,
-  productImage?: String
+export interface IProductDocument extends Document {
+  _id: Schema.Types.ObjectId,
+  name: String,
+  price: Number,
+  productImage: String
 }
