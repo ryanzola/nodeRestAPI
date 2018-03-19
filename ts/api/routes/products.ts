@@ -41,11 +41,11 @@ export class ProductsRouter {
   });
 
   init() {
-    this.router.get('/', ProductsController.products_get_all);
-    this.router.post("/", checkAuth, this.upload.single("productImage"), ProductsController.products_create_product);
-    this.router.get("/:productId", ProductsController.products_get_product);
-    this.router.patch("/:productId", checkAuth, ProductsController.products_edit_product);
-    this.router.delete("/:productId", checkAuth, ProductsController.products_delete_product);
+    this.router.get('/', this.productsController.products_get_all);
+    this.router.post("/", checkAuth, this.upload.single("productImage"), this.productsController.products_create_product);
+    this.router.get("/:productId", this.productsController.products_get_product);
+    this.router.patch("/:productId", checkAuth, this.productsController.products_edit_product);
+    this.router.delete("/:productId", checkAuth, this.productsController.products_delete_product);
   }
 }
 

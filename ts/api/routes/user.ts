@@ -19,7 +19,7 @@ export class UserRouter {
   init() {
     this.router.post('/signup', this.userController.user_login);
     this.router.post('/login', this.userController.user_login);
-    this.router.delete('/:userId', checkAuth, this.userController.user_delete);
+    this.router.delete('/:userId', this.userController.user_delete);
   }
 
 }

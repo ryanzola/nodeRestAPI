@@ -4,7 +4,7 @@ import * as mongoose from 'mongoose'
 import { Order } from '../models/order'
 import { Product } from '../models/product'
 
-export class OrdersController {
+export default class OrdersController {
   constructor() {}
 
   orders_get_all(req: Request, res: Response, next: NextFunction) {
@@ -70,7 +70,7 @@ export class OrdersController {
       });
   };
 
-  orders_get_order(req, res, next) {
+  orders_get_order(req: Request, res: Response, next: NextFunction) {
     Order.findById(req.params.orderId)
       .exec()
       .then(order => {
@@ -94,7 +94,7 @@ export class OrdersController {
       });
   };
 
-  orders_delete_order(req, res, next) {
+  orders_delete_order(req: Request, res: Response, next: NextFunction) {
     Order.remove({ _id: req.params.orderId })
       .exec()
       .then(result => {

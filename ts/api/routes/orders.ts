@@ -1,21 +1,23 @@
 import {Router, Request, Response, NextFunction} from 'express';
 import checkAuth from '../middleware/check-auth'
 
-const OrdersController = require("../controllers/orders");
+import OrdersController from '../controllers/orders';
 
 export class OrdersRouter {
   router: Router;
+  ordersController: OrdersController;
 
   constructor() {
     this.router = Router();
+    this.ordersController = new OrdersController()
     this.init()
   }
 
   init() {
-    this.router.get('/', checkAuth, OrdersController.orders_get_all);
-    this.router.post('/', checkAuth, OrdersController.orders_create_order);
-    this.router.get('/:orderId', checkAuth, OrdersController.orders_get_order);
-    this.router.delete('/:orderId', checkAuth, OrdersController.orders_delete_order);
+    this.router.get('/', checkAuth, this.ordersController.orders_get_all);
+    this.router.post('/', checkAuth, this.ordersController.orders_create_order);
+    this.router.get('/:orderId', checkAuth, this.ordersController.orders_get_order);
+    this.router.delete('/:orderId', checkAuth, this.ordersController.orders_delete_order);
   }
 }
 

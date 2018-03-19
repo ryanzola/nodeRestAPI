@@ -29,7 +29,7 @@ class App {
     this.express.use(bodyParser.json());
     this.express.use(bodyParser.urlencoded({ extended: false }));
 
-    this.express.use((req, res, next) => {
+    this.express.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
       res.header("Access-Control-Allow-Origin", "*");
       res.header(
         "Access-Control-Allow-Headers",
@@ -43,12 +43,12 @@ class App {
       next();
     });
 
-    this.express.use((req, res, next) => {
+    this.express.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
       const error = new Error("Not found");
       next(error);
     });
     
-    this.express.use((error, req, res, next) => {
+    this.express.use((error, req: express.Request, res: express.Response, next: express.NextFunction) => {
       res.status(error.status || 500);
       res.json({
         error: {
