@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const multer = require("multer");
-const check_auth_1 = require("../middleware/check-auth");
 const products_1 = require("../controllers/products");
 class ProductsRouter {
     constructor() {
@@ -35,10 +34,10 @@ class ProductsRouter {
     }
     init() {
         this.router.get('/', this.productsController.products_get_all);
-        this.router.post("/", check_auth_1.default, this.upload.single("productImage"), this.productsController.products_create_product);
+        this.router.post("/", this.upload.single("productImage"), this.productsController.products_create_product);
         this.router.get("/:productId", this.productsController.products_get_product);
-        this.router.patch("/:productId", check_auth_1.default, this.productsController.products_edit_product);
-        this.router.delete("/:productId", check_auth_1.default, this.productsController.products_delete_product);
+        this.router.patch("/:productId", this.productsController.products_edit_product);
+        this.router.delete("/:productId", this.productsController.products_delete_product);
     }
 }
 exports.ProductsRouter = ProductsRouter;

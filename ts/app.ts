@@ -8,7 +8,6 @@ import ProductsRouter from "./api/routes/products";
 import OrderRouter from "./api/routes/orders";
 import UserRouter from "./api/routes/user";
 
-
 // create and configure an ExpressJS web server
 class App {
 
@@ -41,20 +40,6 @@ class App {
         return res.status(200).json({});
       }
       next();
-    });
-
-    this.express.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
-      const error = new Error("Not found");
-      next(error);
-    });
-    
-    this.express.use((error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-      res.status(error.status || 500);
-      res.json({
-        error: {
-          message: error.message
-        }
-      });
     });
   }
 

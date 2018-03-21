@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const checkAuth = require("../middleware/check-auth");
 const user_1 = require("../controllers/user");
 class UserRouter {
     // initialize the user router

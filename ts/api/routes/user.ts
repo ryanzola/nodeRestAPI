@@ -1,5 +1,4 @@
 import {Router, Request, Response, NextFunction} from 'express';
-const checkAuth = require("../middleware/check-auth")
 
 import UserController from '../controllers/user'
 

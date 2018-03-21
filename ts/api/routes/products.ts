@@ -1,6 +1,5 @@
 import {Router, Request, Response, NextFunction} from 'express';
 import * as multer from 'multer'
-import checkAuth from '../middleware/check-auth'
 
 import ProductsController from '../controllers/products';
 import { Product } from '../models/product';
@@ -42,10 +41,10 @@ export class ProductsRouter {
 
   init() {
     this.router.get('/', this.productsController.products_get_all);
-    this.router.post("/", checkAuth, this.upload.single("productImage"), this.productsController.products_create_product);
+    this.router.post("/", this.upload.single("productImage"), this.productsController.products_create_product);
     this.router.get("/:productId", this.productsController.products_get_product);
-    this.router.patch("/:productId", checkAuth, this.productsController.products_edit_product);
-    this.router.delete("/:productId", checkAuth, this.productsController.products_delete_product);
+    this.router.patch("/:productId", this.productsController.products_edit_product);
+    this.router.delete("/:productId", this.productsController.products_delete_product);
   }
 }
 
