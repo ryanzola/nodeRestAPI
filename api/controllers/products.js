@@ -1,95 +1,69 @@
-const mongoose = require("mongoose");
+const { Client } = require('pg');
 
-const Product = require("../models/product");
+const Product = require('../models/product');
 
+// Database connection
+const client = new Client({
+  user: process.env.DB_USER,
+  host: process.env.HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASS,
+  port: 5433
+});
+client.connect();
 
 exports.products_get_all = (req, res, next) => {
-  Product.find()
-    .select("name price _id productImage")
-    .exec()
-    .then(docs => {
-      const response = {
-        count: docs.length,
-        products: docs.map(doc => {
-          return {
-            name: doc.name,
-            price: doc.price,
-            productImage: doc.productImage,
-            _id: doc._id,
-            url: {
-              request: {
-                type: "GET",
-                url: "http://localhost:3000/products/" + doc._id
-              }
-            }
-          };
-        })
-      };
-      res.status(200).json(response);
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json(err);
+  client.query(
+    'SELECT * from products'
+  )
+  .then(result => {
+      res.status(200).json(result.rows);
+  })
+  .catch(err => {
+    res.status(500).json({
+      error: err
     });
+  });
 };
 
 exports.products_create_product = (req, res, next) => {
-  const product = new Product({
-    _id: new mongoose.Types.ObjectId(),
-    name: req.body.name,
-    price: req.body.price,
-    productImage: req.file.path
-  });
-  product
-    .save()
-    .then(result => {
-      console.log(result);
-      res.status(201).json({
-        message: "created product successfully",
-        createdProduct: {
-          name: result.name,
-          price: result.price,
-          _id: result._id,
-          productImage: result.productImage,
-          request: {
-            type: "GET",
-            url: "http://localhost:3000/products/" + result._id
-          }
-        }
-      });
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        error: err
-      });
-    });
+  client.query(
+    'INSERT INTO products(name, price, productImage) VALUES($1, $2, $3)',
+    [req.body.name, req.body.price, req.file.path],
+    (err, result) => {
+      if (err) console.log(err);
+
+      res.redirect('/products');
+    }
+  );
 };
 
 exports.products_get_product = (req, res, next) => {
-  const id = req.params.productId;
-  Product.findById(id)
-    .select("name price _id productImage")
-    .exec()
-    .then(doc => {
-      console.log(doc);
-      if (doc) {
-        res.status(200).json(doc);
-      } else {
-        res.status(404).json({
-          message: "no valid entry found for provided ID"
-        });
-      }
+  client.query(
+    'SELECT * FROM products WHERE _id = $1',
+    [req.params.productId],
+  )
+  .then(result => {
+    res.status(200).json(result.rows[0])
+  })
+  .catch(err => {
+    res.status(500).json({
+      error: err
     })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        error: err
-      });
-    });
+  })
 };
 
+// untested
 exports.products_edit_product = (req, res, next) => {
+  client.query(
+    'UPDATE products SET name=$1, price=$2, productImage=$3 WHERE _id=$4',
+    [req.body.name, req.body.price, req.file.path, req.params.productId],
+    (err, result) => {
+      if (err) console.log(err);
+
+      res.redirect('/products')
+    }
+  )
   const id = req.params.productId;
   const updateOps = {};
   for (const ops of req.body) {
@@ -100,10 +74,10 @@ exports.products_edit_product = (req, res, next) => {
     .then(result => {
       console.log(result);
       res.status(200).json({
-        message: "product successfully updated",
+        message: 'product successfully updated',
         request: {
-          type: "GET",
-          url: "http//localhost:3000/products" + id
+          type: 'GET',
+          url: 'http//localhost:3000/products' + id
         }
       });
     })
@@ -114,16 +88,10 @@ exports.products_edit_product = (req, res, next) => {
 };
 
 exports.products_delete_product = (req, res, next) => {
-  const id = req.params.productId;
-  Product.remove({ _id: id })
-    .exec()
-    .then(result => {
-      res.status(200).json({
-        message: "product successfully deleted"
-      });
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json(err);
-    });
+  client.query('DELETE FROM products WHERE id=$1', 
+  [req.params.productId],
+  (err, result) => {
+    res.status(200)
+  }
+)
 };

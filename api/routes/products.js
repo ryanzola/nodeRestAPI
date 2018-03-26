@@ -32,9 +32,9 @@ const upload = multer({
 const Product = require("../models/product");
 
 router.get("/", ProductsController.products_get_all);
-router.post("/", checkAuth, upload.single("productImage"), ProductsController.products_create_product);
+router.post("/", upload.single("productImage"), ProductsController.products_create_product);
 router.get("/:productId", ProductsController.products_get_product);
-router.patch("/:productId", checkAuth, ProductsController.products_edit_product);
-router.delete("/:productId", checkAuth, ProductsController.products_delete_product);
+router.patch("/:productId", ProductsController.products_edit_product);
+router.delete("/:productId", ProductsController.products_delete_product);
 
 module.exports = router;

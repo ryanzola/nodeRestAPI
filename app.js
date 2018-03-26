@@ -2,14 +2,21 @@ const express = require("express");
 const app = express();
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
-const mongoose = require("mongoose");
+const { Client } = require('pg');
 
 const productRoutes = require("./api/routes/products");
 const orderRoutes = require("./api/routes/orders");
 const userRoutes = require("./api/routes/user");
 
-mongoose.connect("mongodb://" + process.env.MONGO_ATLAS_USER + ":" + process.env.MONGO_ATLAS_PW + "@cluster0-shard-00-00-ta2bv.mongodb.net:27017,cluster0-shard-00-01-ta2bv.mongodb.net:27017,cluster0-shard-00-02-ta2bv.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin", {useMongoClient: true})
-mongoose.Promise = global.Promise;
+// Database connection
+const client = new Client({
+  user: process.env.DB_USER,
+  host: process.env.HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASS,
+  port: 5433
+});
+client.connect();
 
 // middleware
 app.use(morgan("dev"));
