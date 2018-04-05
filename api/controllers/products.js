@@ -1,6 +1,5 @@
-const { Client } = require('pg');
-
-const Product = require('../models/product');
+import { Client } from 'pg';
+import Product from '../models/product';
 
 // Database connection
 const client = new Client({
@@ -12,12 +11,12 @@ const client = new Client({
 });
 client.connect();
 
-exports.products_get_all = (req, res, next) => {
+exports.products_get_all = (req, res) => {
   client.query(
     'SELECT * from products'
   )
   .then(result => {
-      res.status(200).json(result.rows);
+    res.status(200).json(result.rows);
   })
   .catch(err => {
     res.status(500).json({
@@ -26,44 +25,44 @@ exports.products_get_all = (req, res, next) => {
   });
 };
 
-exports.products_create_product = (req, res, next) => {
+exports.products_create_product = (req, res) => {
   client.query(
     'INSERT INTO products(name, price, productImage) VALUES($1, $2, $3)',
     [req.body.name, req.body.price, req.file.path],
-    (err, result) => {
-      if (err) console.log(err);
+    (err) => {
+      if (err) console.error(err);
 
       res.redirect('/products');
     }
   );
 };
 
-exports.products_get_product = (req, res, next) => {
+exports.products_get_product = (req, res) => {
   client.query(
     'SELECT * FROM products WHERE _id = $1',
     [req.params.productId],
   )
   .then(result => {
-    res.status(200).json(result.rows[0])
+    res.status(200).json(result.rows[0]);
   })
   .catch(err => {
     res.status(500).json({
       error: err
-    })
-  })
+    });
+  });
 };
 
 // untested
-exports.products_edit_product = (req, res, next) => {
+exports.products_edit_product = (req, res) => {
   client.query(
     'UPDATE products SET name=$1, price=$2, productImage=$3 WHERE _id=$4',
     [req.body.name, req.body.price, req.file.path, req.params.productId],
-    (err, result) => {
-      if (err) console.log(err);
+    (err) => {
+      if (err) console.error(err);
 
-      res.redirect('/products')
+      res.redirect('/products');
     }
-  )
+  );
   const id = req.params.productId;
   const updateOps = {};
   for (const ops of req.body) {
@@ -72,7 +71,7 @@ exports.products_edit_product = (req, res, next) => {
   Product.update({ _id: id }, { $set: updateOps })
     .exec()
     .then(result => {
-      console.log(result);
+      console.info(result);
       res.status(200).json({
         message: 'product successfully updated',
         request: {
@@ -82,16 +81,17 @@ exports.products_edit_product = (req, res, next) => {
       });
     })
     .catch(err => {
-      console.log(err);
+      console.error(err);
       res.status(500).json(err);
     });
 };
 
-exports.products_delete_product = (req, res, next) => {
+exports.products_delete_product = (req, res) => {
   client.query('DELETE FROM products WHERE id=$1', 
-  [req.params.productId],
-  (err, result) => {
-    res.status(200)
-  }
-)
+  [req.params.productId]
+  ).then(() => {
+    res.status(200);
+  }).catch(err => {
+    res.status(500).json(err);
+  });
 };

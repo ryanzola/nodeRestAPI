@@ -1,8 +1,8 @@
-const express = require("express");
-const router = express.Router();
-const checkAuth = require("../middleware/check-auth");
+import { Router } from 'express';
+import checkAuth from '../middleware/check-auth';
+import OrdersController from '../controllers/orders';
 
-const OrdersController = require("../controllers/orders");
+const router = Router();
 
 router.get("/", checkAuth, OrdersController.orders_get_all);
 router.post("/", checkAuth, OrdersController.orders_create_order);

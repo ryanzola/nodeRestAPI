@@ -1,9 +1,8 @@
-const mongoose = require("mongoose");
+import mongoose from 'mongoose';
+import Order from '../models/order';
+import Product from '../models/product';
 
-const Order = require("../models/order");
-const Product = require("../models/product");
-
-exports.orders_get_all = (req, res, next) => {
+exports.orders_get_all = (req, res) => {
   Order.find()
     .select("product quantity _id")
     .exec()
@@ -30,7 +29,7 @@ exports.orders_get_all = (req, res, next) => {
     });
 };
 
-exports.orders_create_order = (req, res, next) => {
+exports.orders_create_order = (req, res) => {
   Product.findById(req.body.productId)
     .then(product => {
       if (!product) {
@@ -66,7 +65,7 @@ exports.orders_create_order = (req, res, next) => {
     });
 };
 
-exports.orders_get_order = (req, res, next) => {
+exports.orders_get_order = (req, res) => {
   Order.findById(req.params.orderId)
     .exec()
     .then(order => {
@@ -90,10 +89,11 @@ exports.orders_get_order = (req, res, next) => {
     });
 };
 
-exports.orders_delete_order = (req, res, next) => {
+exports.orders_delete_order = (req, res) => {
   Order.remove({ _id: req.params.orderId })
     .exec()
     .then(result => {
+      console.info(result);
       res.status(200).json({
         message: "order was successfully deleted",
         request: {

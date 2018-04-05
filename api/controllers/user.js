@@ -1,8 +1,7 @@
-const { Client } = require("pg")
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-
-const User = require("../models/user");
+import { Client } from 'pg';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import User from '../models/user';
 
 // Database connection
 const client = new Client({
@@ -14,7 +13,7 @@ const client = new Client({
 });
 client.connect();
 
-exports.user_signup = (req, res, next) => {
+exports.user_signup = (req, res) => {
   client.query(
     'SELECT * FROM user WHERE email=$1'
   )
@@ -22,7 +21,7 @@ exports.user_signup = (req, res, next) => {
     if (user.length >= 1) {
       return res.status(409).json({
         message: 'this user already exists'
-      })
+      });
     } else {
       bcrypt.hash(req.body.password, 10, (err, hash) => {
         if (err) {
@@ -35,30 +34,30 @@ exports.user_signup = (req, res, next) => {
             [req.body.email, hash, req.body.firstname, req.body.familyname]
           )
           .then(result => {
-            console.log(result);
+            console.info(result);
             res.status(201).json({
               message: 'user created'
-            })
+            });
           })
           .catch(err => {
-            console.log(err);
+            console.error(err);
             res.status(500).json({
               error: err
-            })
-          })
+            });
+          });
         }
-      })
+      });
     }
   })
   .catch(err => {
-    console.log(err);
+    console.error(err);
     res.status(500).json({
       error: err + `. Oh, and youre a moron!`
-    })
-  })
+    });
+  });
 };
 
-exports.user_login = (req, res, next) => {
+exports.user_login = (req, res) => {
   User.find({ email: req.body.email })
     .exec()
     .then(user => {
@@ -103,10 +102,10 @@ exports.user_login = (req, res, next) => {
     });
 };
 
-exports.user_delete = (req, res, next) => {
+exports.user_delete = (req, res) => {
   User.remove({ _id: req.params.userId })
     .exec()
-    .then(result => {
+    .then(() => {
       res.status(200).json({
         message: "user deleted"
       });
