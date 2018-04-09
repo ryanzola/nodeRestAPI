@@ -15,14 +15,14 @@ exports.products_get_all = (req, res) => {
   client.query(
     'SELECT * from products'
   )
-  .then(result => {
-    res.status(200).json(result.rows);
-  })
-  .catch(err => {
-    res.status(500).json({
-      error: err
+    .then(result => {
+      res.status(200).json(result.rows);
+    })
+    .catch(err => {
+      res.status(500).json({
+        error: err
+      });
     });
-  });
 };
 
 exports.products_create_product = (req, res) => {
@@ -42,14 +42,14 @@ exports.products_get_product = (req, res) => {
     'SELECT * FROM products WHERE _id = $1',
     [req.params.productId],
   )
-  .then(result => {
-    res.status(200).json(result.rows[0]);
-  })
-  .catch(err => {
-    res.status(500).json({
-      error: err
+    .then(result => {
+      res.status(200).json(result.rows[0]);
+    })
+    .catch(err => {
+      res.status(500).json({
+        error: err
+      });
     });
-  });
 };
 
 // untested
@@ -88,7 +88,7 @@ exports.products_edit_product = (req, res) => {
 
 exports.products_delete_product = (req, res) => {
   client.query('DELETE FROM products WHERE id=$1', 
-  [req.params.productId]
+    [req.params.productId]
   ).then(() => {
     res.status(200);
   }).catch(err => {
