@@ -1,6 +1,9 @@
+require('dotenv').config;
+import pool from '../database';
 import mongoose from 'mongoose';
 import Order from '../models/order';
 import Product from '../models/product';
+
 
 exports.orders_get_all = (req, res) => {
   Order.find()

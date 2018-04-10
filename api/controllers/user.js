@@ -1,16 +1,7 @@
 require('dotenv').config();
-import { Pool } from 'pg';
+import pool from '../database';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-
-// Database connection
-const pool = new Pool({
-  user: process.env.PGUSER,
-  host: process.env.PGHOST,
-  database: process.env.PGDATABASE,
-  password: process.env.PGPASSWORD,
-  port: process.env.PGPORT
-});
 
 exports.user_signup = (req, res) => {
   pool.connect()
@@ -97,7 +88,7 @@ exports.user_login = (req, res) => {
               );
               return res.status(200).json({
                 message: 'authentication successful',
-                token: token
+                Authentication: token
               });
             }
             res.status(401).json({

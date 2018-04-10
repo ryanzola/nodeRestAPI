@@ -1,14 +1,6 @@
 require('dotenv').config();
-import { Pool } from 'pg';
+import pool from '../database';
 
-// Database connection
-const pool = new Pool({
-  user: process.env.PGUSER,
-  host: process.env.PGHOST,
-  database: process.env.PGDATABASE,
-  password: process.env.PGPASSWORD,
-  port: process.env.PGPORT
-});
 
 exports.products_get_all = (req, res) => {
   pool.connect()
@@ -36,15 +28,15 @@ exports.products_create_product = (req, res) => {
   pool.connect()
     .then(client => {
       client.query(
-        'INSERT INTO products(name, price, productImage) VALUES($1, $2, $3)',
+        'INSERT INTO products(name, price, product_image) VALUES($1, $2, $3)',
         [req.body.name, req.body.price, req.file.path])
-        .then(result => {
+        .then(() => {
           client.release();
-          result.redirect('/products');
+          res.redirect('/products');
         })
         .catch(err => {
           res.status(500).json({
-            error: err
+            error: err.message
           });
         });
     })
@@ -75,26 +67,24 @@ exports.products_get_product = (req, res) => {
 };
 
 exports.products_edit_product = (req, res) => {
+  // still doesnt work
   pool.connect()
     .then(client => {
       client.query(
-        'UPDATE products SET name=$1, price=$2, productImage=$3 WHERE _id=$4',
-        [req.body.name, req.body.price, req.file.path, req.params.productId],
-        (err) => {
-          if (err) console.error(err);
-    
-          res.redirect('/products');
-        }
+        'UPDATE products SET name=$1, price=$2, product_image=$3 WHERE _id=$4',
+        [req.body.name, req.body.price, req.file.path, req.params.productId]
       )
         .then(result => {
           client.release();
           console.info(result);
+          res.redirect('/products');
         })
         .catch(err => { 
           client.release();
           console.error(err);
         });
-    }).catch(err => {
+    })
+    .catch(err => {
       console.error('connection error', err.message, err.stack); 
     });
 
