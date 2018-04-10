@@ -1,4 +1,3 @@
-require('dotenv').config;
 require('dotenv').config();
 import pool from '../database';
 
