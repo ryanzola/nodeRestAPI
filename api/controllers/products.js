@@ -71,13 +71,13 @@ exports.products_edit_product = (req, res) => {
   pool.connect()
     .then(client => {
       client.query(
-        'UPDATE products SET name=$1, price=$2, product_image=$3 WHERE _id=$4',
+        'UPDATE products SET name = $1, price = $2, product_image = $3 WHERE _id = $4',
         [req.body.name, req.body.price, req.file.path, req.params.productId]
       )
         .then(result => {
           client.release();
           console.info(result);
-          res.redirect('/products');
+          res.redirect(`/products/${req.params.productId}`);
         })
         .catch(err => { 
           client.release();
