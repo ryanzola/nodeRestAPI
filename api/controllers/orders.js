@@ -24,8 +24,8 @@ exports.orders_get_all = (req, res) => {
 
 exports.orders_create_order = (req, res) => {
   res.status(200).json({
-    message: 'write this function please';
-  })
+    message: 'write this function please'
+  });
 };
 
 exports.orders_get_order = (req, res) => {
