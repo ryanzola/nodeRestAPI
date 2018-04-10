@@ -1,114 +1,74 @@
 require('dotenv').config;
+require('dotenv').config();
 import pool from '../database';
-import mongoose from 'mongoose';
-import Order from '../models/order';
-import Product from '../models/product';
-
 
 exports.orders_get_all = (req, res) => {
-  Order.find()
-    .select('product quantity _id')
-    .exec()
-    .then(docs => {
-      res.status(200).json({
-        count: docs.length,
-        orders: docs.map(doc => {
-          return {
-            _id: doc._id,
-            product: doc.product,
-            quantity: doc.quantity,
-            request: {
-              type: 'GET',
-              url: 'http://localhost:3000/orders/' + doc._id
-            }
-          };
+  pool.connect()
+    .then(client => {
+      client.query('SELECT * FROM orders')
+        .then(result => {
+          client.release();
+          res.status(200).json(result.rows);
         })
-      });
+        .catch(err => {
+          client.release();
+          res.status(500).json({
+            error: err.message
+          });
+        });
     })
     .catch(err => {
-      res.status(500).json({
-        error: err
-      });
+      console.error('connection error', err.message, err.stack); 
     });
 };
 
 exports.orders_create_order = (req, res) => {
-  Product.findById(req.body.productId)
-    .then(product => {
-      if (!product) {
-        return res.status(404).json({
-          message: 'product not found'
-        });
-      }
-      const order = new Order({
-        _id: mongoose.Types.ObjectId(),
-        quantity: req.body.quantity,
-        product: req.body.productId
-      });
-      return order.save();
-    })
-    .then(result => {
-      res.status(201).json({
-        message: 'order was successfully created',
-        createdOrder: {
-          _id: result._id,
-          product: result.product,
-          quantity: result.quantity
-        },
-        request: {
-          type: 'GET',
-          url: 'http://localhost:3000/orders/' + result._id
-        }
-      });
-    })
-    .catch(err => {
-      res.status(500).json({
-        error: err
-      });
-    });
+  res.status(200).json({
+    message: 'write this function please';
+  })
 };
 
 exports.orders_get_order = (req, res) => {
-  Order.findById(req.params.orderId)
-    .exec()
-    .then(order => {
-      if (!order) {
-        return res.status(404).json({
-          message: 'order not found'
+  pool.connect()
+    .then(client => {
+      client.query(
+        'SELECT * FROM orders WHERE _id = $1',
+        [req.params.orderId],
+      )
+        .then(result => {
+          client.release();
+          res.status(200).json(result.rows[0]);
+        })
+        .catch(err => {
+          client.release();
+          res.status(500).json({
+            error: err
+          });
         });
-      }
-      res.status(200).json({
-        order: order,
-        request: {
-          type: 'GET',
-          url: 'http://localhost:3000/orders'
-        }
-      });
     })
-    .catch(err => {
-      res.status(500).json({
-        error: err
-      });
+    .catch(err => { 
+      console.error('connection error', err.message, err.stack); 
     });
 };
 
 exports.orders_delete_order = (req, res) => {
-  Order.remove({ _id: req.params.orderId })
-    .exec()
-    .then(result => {
-      console.info(result);
-      res.status(200).json({
-        message: 'order was successfully deleted',
-        request: {
-          type: 'POST',
-          url: 'http://localhost:3000/orders',
-          body: { productId: 'ID', quantity: 'Number' }
-        }
-      });
+  pool.connect()
+    .then(client => {
+      client.query('DELETE FROM orders WHERE _id = $1', 
+        [req.params.orderId]
+      )
+        .then(() => {
+          client.release();
+          res.status(200).json({
+            message: 'order deleted'
+          });
+        })
+        .catch(err => {
+          client.release();
+          res.status(500).json(err);
+        });
     })
     .catch(err => {
-      res.status(500).json({
-        error: err
-      });
+      console.error('connection error', err.message, err.stack); 
     });
 };

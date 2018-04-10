@@ -35,6 +35,7 @@ exports.products_create_product = (req, res) => {
           res.redirect('/products');
         })
         .catch(err => {
+          client.release();
           res.status(500).json({
             error: err.message
           });
@@ -53,9 +54,11 @@ exports.products_get_product = (req, res) => {
         [req.params.productId],
       )
         .then(result => {
+          client.release();
           res.status(200).json(result.rows[0]);
         })
         .catch(err => {
+          client.release();
           res.status(500).json({
             error: err
           });
@@ -118,11 +121,13 @@ exports.products_delete_product = (req, res) => {
         [req.params.productId]
       )
         .then(() => {
+          client.release();
           res.status(200).json({
             message: 'product deleted'
           });
         })
         .catch(err => {
+          client.release();
           res.status(500).json(err);
         });
     })
