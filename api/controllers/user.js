@@ -17,7 +17,7 @@ exports.user_signup = (req, res) => {
   pool.connect()
     .then(client => {
       client.query(
-        'SELECT * FROM user WHERE email = $1',
+        'SELECT * FROM users WHERE email = $1',
         [req.body.email]
       )
         .then(user => {
@@ -33,7 +33,7 @@ exports.user_signup = (req, res) => {
                 });
               } else {
                 client.query(
-                  'INSERT INTO user(email, password, firstname, familyname) VALUES($1, $2, $3, $4)',
+                  'INSERT INTO users(email, password, firstname, familyname) VALUES($1, $2, $3, $4)',
                   [req.body.email, hash, req.body.firstname, req.body.familyname]
                 )
                   .then(result => {
@@ -66,74 +66,87 @@ exports.user_signup = (req, res) => {
 };
 
 exports.user_login = (req, res) => {
-  pool.connect().then(client => {
-    client.query()
-      .then()
-      .catch(err => {
-        client.release();
-        res.status(500).json({
-          error: err
-        });
-      });
-  }).catch(err => {
-    console.error('connection error', err.message, err.stack);
-  });
-
-  User.find({ email: req.body.email })
-    .exec()
-    .then(user => {
-      if (user.length < 1) {
-        res.status(401).json({
-          message: 'authentication failed'
-        });
-      }
-      bcrypt.compare(req.body.password, user[0].password, (err, result) => {
-        if (err) {
-          return res.status(401).json({
-            message: 'authentication failed'
+  pool.connect()
+    .then(client => {
+      client.query('SELECT FROM users WHERE _id = $1', 
+        [req.params.email]
+      )
+        .then(result => {
+          console.info(result);
+        })
+        .catch(err => {
+          client.release();
+          res.status(500).json({
+            error: err
           });
-        }
-
-        if (result) {
-          const token = jwt.sign(
-            {
-              email: user[0].email,
-              userId: user[0]._id
-            },
-            process.env.JWT_KEY,
-            {
-              expiresIn: '1hr'
-            }
-          );
-          return res.status(200).json({
-            message: 'authentication successful',
-            token: token
-          });
-        }
-
-        res.status(401).json({
-          message: 'authentication failed'
         });
-      });
     })
     .catch(err => {
-      res.status(500).json({
-        error: err
-      });
+      console.error('connection error', err.message, err.stack);
     });
+
+  // User.find({ email: req.body.email })
+  //   .exec()
+  //   .then(user => {
+  //     if (user.length < 1) {
+  //       res.status(401).json({
+  //         message: 'authentication failed'
+  //       });
+  //     }
+  //     bcrypt.compare(req.body.password, user[0].password, (err, result) => {
+  //       if (err) {
+  //         return res.status(401).json({
+  //           message: 'authentication failed'
+  //         });
+  //       }
+
+  //       if (result) {
+  //         const token = jwt.sign(
+  //           {
+  //             email: user[0].email,
+  //             userId: user[0]._id
+  //           },
+  //           process.env.JWT_KEY,
+  //           {
+  //             expiresIn: '1hr'
+  //           }
+  //         );
+  //         return res.status(200).json({
+  //           message: 'authentication successful',
+  //           token: token
+  //         });
+  //       }
+
+  //       res.status(401).json({
+  //         message: 'authentication failed'
+  //       });
+  //     });
+  //   })
+  //   .catch(err => {
+  //     res.status(500).json({
+  //       error: err
+  //     });
+  //   });
 };
 
 exports.user_delete = (req, res) => {
-  User.remove({ _id: req.params.userId })
-    .exec()
-    .then(() => {
-      res.status(200).json({
-        message: 'user deleted'
-      });
+  pool.connect()
+    .then(client => {
+      client.query('DELETE FROM users WHERE _id=$1', 
+        [req.params.userId]
+      )
+        .then(result => {
+          result.status(200).json({
+            message: 'user deleted'
+          });
+        })
+        .catch(err => {
+          res.status(500).json({
+            error: err
+          });
+        });
     })
     .catch(err => {
-      res.status(500).json({
-        error: err
-      });
+      console.error('connection error', err.message, err.stack);
     });
 };
