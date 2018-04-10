@@ -114,11 +114,13 @@ exports.products_edit_product = (req, res) => {
 exports.products_delete_product = (req, res) => {
   pool.connect()
     .then(client => {
-      client.query('DELETE FROM products WHERE id=$1', 
+      client.query('DELETE FROM products WHERE _id = $1', 
         [req.params.productId]
       )
         .then(() => {
-          res.status(200);
+          res.status(200).json({
+            message: 'product deleted'
+          });
         })
         .catch(err => {
           res.status(500).json(err);
