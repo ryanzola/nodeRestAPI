@@ -1,63 +1,84 @@
-import { Client } from 'pg';
+require('dotenv').config();
+import { Pool } from 'pg';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/user';
 
 // Database connection
-const client = new Client({
-  user: 'ryanzola',
-  host: 'localhost',
-  database: 'coolbooks',
-  password: '11Passvip02',
-  port: 5433
+const pool = new Pool({
+  user: process.env.PGUSER,
+  host: process.env.PGHOST,
+  database: process.env.PGDATABASE,
+  password: process.env.PGPASSWORD,
+  port: process.env.PGPORT
 });
-client.connect();
 
 exports.user_signup = (req, res) => {
-  client.query(
-    'SELECT * FROM user WHERE email=$1'
-  )
-    .then(user => {
-      if (user.length >= 1) {
-        return res.status(409).json({
-          message: 'this user already exists'
-        });
-      } else {
-        bcrypt.hash(req.body.password, 10, (err, hash) => {
-          if (err) {
-            return res.status(500).json({
-              error: 'hi, ' + err
+  pool.connect()
+    .then(client => {
+      client.query(
+        'SELECT * FROM user WHERE email = $1',
+        [req.body.email]
+      )
+        .then(user => {
+          if (user.length >= 1) {
+            return res.status(409).json({
+              message: 'this user already exists'
             });
           } else {
-            client.query(
-              'INSERT INTO user(email, password, firstname, familyname) VALUES($1, $2, $3, $4)',
-              [req.body.email, hash, req.body.firstname, req.body.familyname]
-            )
-              .then(result => {
-                console.info(result);
-                res.status(201).json({
-                  message: 'user created'
+            bcrypt.hash(req.body.password, 10, (err, hash) => {
+              if (err) {
+                return res.status(500).json({
+                  error: 'hi, ' + err
                 });
-              })
-              .catch(err => {
-                console.error(err);
-                res.status(500).json({
-                  error: err
-                });
-              });
+              } else {
+                client.query(
+                  'INSERT INTO user(email, password, firstname, familyname) VALUES($1, $2, $3, $4)',
+                  [req.body.email, hash, req.body.firstname, req.body.familyname]
+                )
+                  .then(result => {
+                    console.info(result);
+                    res.status(201).json({
+                      message: 'user created'
+                    });
+                  })
+                  .catch(err => {
+                    console.error(err);
+                    res.status(500).json({
+                      error: err
+                    });
+                  });
+              }
+            });
           }
+        })
+        .catch(err => {
+          console.error(err);
+          res.status(500).json({
+            request: req.body,
+            error: err + `. Oh, and youre a moron!`
+          });
         });
-      }
     })
     .catch(err => {
-      console.error(err);
-      res.status(500).json({
-        error: err + `. Oh, and youre a moron!`
-      });
+      console.error('connection error', err.message, err.stack);
     });
 };
 
 exports.user_login = (req, res) => {
+  pool.connect().then(client => {
+    client.query()
+      .then()
+      .catch(err => {
+        client.release();
+        res.status(500).json({
+          error: err
+        });
+      });
+  }).catch(err => {
+    console.error('connection error', err.message, err.stack);
+  });
+
   User.find({ email: req.body.email })
     .exec()
     .then(user => {
