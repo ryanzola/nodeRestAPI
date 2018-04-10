@@ -2,7 +2,6 @@ require('dotenv').config();
 import { Pool } from 'pg';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import User from '../models/user';
 
 // Database connection
 const pool = new Pool({
@@ -21,6 +20,7 @@ exports.user_signup = (req, res) => {
         [req.body.email]
       )
         .then(user => {
+          console.info(user);
           if (user.length >= 1) {
             return res.status(409).json({
               message: 'this user already exists'
@@ -45,7 +45,7 @@ exports.user_signup = (req, res) => {
                   .catch(err => {
                     console.error(err);
                     res.status(500).json({
-                      error: err
+                      error: err + 'hej tho'
                     });
                   });
               }
@@ -68,11 +68,42 @@ exports.user_signup = (req, res) => {
 exports.user_login = (req, res) => {
   pool.connect()
     .then(client => {
-      client.query('SELECT FROM users WHERE _id = $1', 
-        [req.params.email]
+      client.query('SELECT * FROM users WHERE email = $1', 
+        [req.body.email]
       )
-        .then(result => {
-          console.info(result);
+        .then(user => {
+          // res.status(200).json( user.rowCount );
+          if(user.rowCount < 1) {
+            res.status(401).json({
+              message: 'authentication failed 0'
+            });
+          } 
+          bcrypt.compare(req.body.password, user.rows[0].password, (err, result) => {
+            if (err) {
+              return res.status(401).json({ 
+                message: 'authentication failed 1'
+              });
+            }
+            if (result) {
+              const token = jwt.sign(
+                {
+                  email: user.rows[0].email,
+                  userId: user.rows[0]._id
+                },
+                process.env.JWT_KEY,
+                {
+                  expiresIn: '1hr'
+                }
+              );
+              return res.status(200).json({
+                message: 'authentication successful',
+                token: token
+              });
+            }
+            res.status(401).json({
+              message: 'authentication failed 2'
+            });
+          });
         })
         .catch(err => {
           client.release();
@@ -84,49 +115,6 @@ exports.user_login = (req, res) => {
     .catch(err => {
       console.error('connection error', err.message, err.stack);
     });
-
-  // User.find({ email: req.body.email })
-  //   .exec()
-  //   .then(user => {
-  //     if (user.length < 1) {
-  //       res.status(401).json({
-  //         message: 'authentication failed'
-  //       });
-  //     }
-  //     bcrypt.compare(req.body.password, user[0].password, (err, result) => {
-  //       if (err) {
-  //         return res.status(401).json({
-  //           message: 'authentication failed'
-  //         });
-  //       }
-
-  //       if (result) {
-  //         const token = jwt.sign(
-  //           {
-  //             email: user[0].email,
-  //             userId: user[0]._id
-  //           },
-  //           process.env.JWT_KEY,
-  //           {
-  //             expiresIn: '1hr'
-  //           }
-  //         );
-  //         return res.status(200).json({
-  //           message: 'authentication successful',
-  //           token: token
-  //         });
-  //       }
-
-  //       res.status(401).json({
-  //         message: 'authentication failed'
-  //       });
-  //     });
-  //   })
-  //   .catch(err => {
-  //     res.status(500).json({
-  //       error: err
-  //     });
-  //   });
 };
 
 exports.user_delete = (req, res) => {
@@ -135,14 +123,14 @@ exports.user_delete = (req, res) => {
       client.query('DELETE FROM users WHERE _id=$1', 
         [req.params.userId]
       )
-        .then(result => {
-          result.status(200).json({
+        .then(() => {
+          res.status(204).json({
             message: 'user deleted'
           });
         })
         .catch(err => {
           res.status(500).json({
-            error: err
+            error: `${err} but hej`
           });
         });
     })
