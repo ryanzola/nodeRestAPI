@@ -3,7 +3,7 @@ import pool from '../database';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-exports.user_signup = (req, res) => {
+const user_signup = (req, res) => {
   pool.connect()
     .then(client => {
       client.query(
@@ -56,7 +56,7 @@ exports.user_signup = (req, res) => {
     });
 };
 
-exports.user_login = (req, res) => {
+const user_login = (req, res) => {
   pool.connect()
     .then(client => {
       client.query('SELECT * FROM users WHERE email = $1', 
@@ -108,7 +108,7 @@ exports.user_login = (req, res) => {
     });
 };
 
-exports.user_delete = (req, res) => {
+const user_delete = (req, res) => {
   pool.connect()
     .then(client => {
       client.query('DELETE FROM users WHERE _id=$1', 
@@ -129,3 +129,5 @@ exports.user_delete = (req, res) => {
       console.error('connection error', err.message, err.stack);
     });
 };
+
+export default { user_signup, user_login, user_delete };

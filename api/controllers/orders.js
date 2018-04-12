@@ -1,7 +1,7 @@
 require('dotenv').config();
 import pool from '../database';
 
-exports.orders_get_all = (req, res) => {
+const orders_get_all = (req, res) => {
   pool.connect()
     .then(client => {
       client.query('SELECT * FROM orders')
@@ -21,13 +21,13 @@ exports.orders_get_all = (req, res) => {
     });
 };
 
-exports.orders_create_order = (req, res) => {
+const orders_create_order = (req, res) => {
   res.status(200).json({
     message: 'write this function please'
   });
 };
 
-exports.orders_get_order = (req, res) => {
+const orders_get_order = (req, res) => {
   pool.connect()
     .then(client => {
       client.query(
@@ -50,7 +50,7 @@ exports.orders_get_order = (req, res) => {
     });
 };
 
-exports.orders_delete_order = (req, res) => {
+const orders_delete_order = (req, res) => {
   pool.connect()
     .then(client => {
       client.query('DELETE FROM orders WHERE _id = $1', 
@@ -70,4 +70,11 @@ exports.orders_delete_order = (req, res) => {
     .catch(err => {
       console.error('connection error', err.message, err.stack); 
     });
+};
+
+export default {
+  orders_get_all,
+  orders_create_order,
+  orders_get_order,
+  orders_delete_order
 };

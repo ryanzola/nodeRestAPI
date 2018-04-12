@@ -2,7 +2,7 @@ require('dotenv').config();
 import pool from '../database';
 
 
-exports.products_get_all = (req, res) => {
+const products_get_all = (req, res) => {
   pool.connect()
     .then(client => {
       client.query(
@@ -24,7 +24,7 @@ exports.products_get_all = (req, res) => {
     });
 };
 
-exports.products_create_product = (req, res) => {
+const products_create_product = (req, res) => {
   pool.connect()
     .then(client => {
       client.query(
@@ -46,7 +46,7 @@ exports.products_create_product = (req, res) => {
     });
 };
 
-exports.products_get_product = (req, res) => {
+const products_get_product = (req, res) => {
   pool.connect()
     .then(client => {
       client.query(
@@ -55,7 +55,13 @@ exports.products_get_product = (req, res) => {
       )
         .then(result => {
           client.release();
-          res.status(200).json(result.rows[0]);
+          if (result.rowCount < 1) {
+            res.status(404).json({
+              message: 'item does not exist'
+            });
+          } else {
+            res.status(200).json(result.rows[0]);
+          }
         })
         .catch(err => {
           client.release();
@@ -69,7 +75,7 @@ exports.products_get_product = (req, res) => {
     });
 };
 
-exports.products_edit_product = (req, res) => {
+const products_edit_product = (req, res) => {
   // still doesnt work
   pool.connect()
     .then(client => {
@@ -114,7 +120,7 @@ exports.products_edit_product = (req, res) => {
   //   });
 };
 
-exports.products_delete_product = (req, res) => {
+const products_delete_product = (req, res) => {
   pool.connect()
     .then(client => {
       client.query('DELETE FROM products WHERE _id = $1', 
@@ -134,4 +140,12 @@ exports.products_delete_product = (req, res) => {
     .catch(err => {
       console.error('connection error', err.message, err.stack); 
     });
+};
+
+export default { 
+  products_get_all, 
+  products_create_product, 
+  products_get_product, 
+  products_edit_product,
+  products_delete_product
 };
